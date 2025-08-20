@@ -516,6 +516,7 @@ async def download_oup_playwright(url: str, filepath: str):
 
 async def download_via_aiohttp(url: str, filepath: str):
     try:
+        print(f"trying aiohttp for {url}")
         headers = {'User-Agent': 'python-requests/2.32.4','From': 'rallan@ihs.gmu.edu'}
         async with aiohttp.ClientSession() as session:
             async with session.get(url, headers=headers, timeout=30) as resp:
@@ -531,7 +532,7 @@ async def download_via_aiohttp(url: str, filepath: str):
 async def universal_download(url: str, filepath: str):
     save_dir = os.path.dirname(filepath)
     os.makedirs(save_dir, exist_ok=True)
-    # Playwright fallback
+    
     try:
         async with async_playwright() as p:
             browser = await p.chromium.launch(headless=True)
@@ -539,7 +540,7 @@ async def universal_download(url: str, filepath: str):
             print(f"➡️ Playwright navigating to: {url}")
             await page.goto(url, wait_until="domcontentloaded")
 
-            # Try direct PDF download via Playwright
+            # First attempt: direct download via <a> click
             try:
                 async with page.expect_download(timeout=10000) as download_info:
                     await page.set_content(f'<a href="{url}" download id="dl">Download</a>')
@@ -550,10 +551,27 @@ async def universal_download(url: str, filepath: str):
                 await browser.close()
                 return filepath, urlparse(url).netloc
             except PlaywrightTimeoutError:
-                print("⏱️ Playwright direct download timeout, trying Selenium fallback...")
+                print("⏱️ Playwright direct download timeout, trying automatic-download fallback...")
+
+            # Second attempt: automatic download by navigating
+            try:
+                async with page.expect_download(timeout=15000) as download_info:
+                    await page.goto(url)  # triggers automatic download
+                download = await download_info.value
+                await download.save_as(filepath)
+                print(f"✅ Playwright automatic download success: {filepath}")
+                await browser.close()
+                return filepath, urlparse(url).netloc
+            except PlaywrightTimeoutError:
+                print("❌ Playwright automatic download failed.")
+
             await browser.close()
     except Exception as e:
         print(f"❌ Playwright session error: {e}")
+        return None, None
+    finally:
+        await browser.close()
+        
     # Selenium fallback
     def selenium_download():
         try:
