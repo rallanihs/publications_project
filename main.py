@@ -5,8 +5,10 @@ import shutil
 import tempfile
 from urllib.parse import urlparse, urljoin
 import pdfplumber
+import asyncio, random
 
 from google.cloud import storage
+from google.cloud import firestore
 
 import pandas as pd
 import numpy as np
@@ -63,13 +65,35 @@ def sage_url_to_epub(url: str) -> str:
             return f"https://journals.sagepub.com/doi/epub/{doi_suffix}"
     return url
 
-async def try_download(func, url, filepath):
-    try:
-        result = await func(url, filepath)
-        return result[0] is not None, result[1]
-    except Exception as e:
-        print(f"❌ Download failed for {url}: {e}")
-        return False, None
+async def try_download(func, url, filepath, max_retries=5, base_delay=2):
+    for attempt in range(max_retries):
+        try:
+            result = await func(url, filepath)
+            return result[0] is not None, result[1]
+            break
+        except Exception as e:
+            message = str(e).lower()
+
+            retryable = (
+                "429" in message
+                or "timeout" in message
+                or "502" in message
+                or "503" in message
+            )
+
+            # Handle 403s with 1 retry only
+            if "403" in message and attempt < 1:
+                await asyncio.sleep(1 + random.random())
+                continue
+
+            if retryable and attempt < max_retries - 1:
+                delay = base_delay * (2 ** attempt) + random.uniform(0, 1)
+                await asyncio.sleep(delay)
+                continue
+            # Non-retryable, or retries exhausted
+            print(f"❌ Download failed for {url}: {e}")
+            return False, None
+    return False, None
 
 def upload_to_gcs(bucket_name: str, filepath: str) -> dict:
     client = storage.Client()
@@ -744,6 +768,22 @@ async def download_pdf_row(row, headers, output_dir, bucket_name):
             txt_public_url = None
             txt_upload_error = None
 
+    db = firestore.Client()
+
+    doc_ref = db.collection("papers").document(DOI)
+    update_data = {
+        "openAccessStatus": "Open" if success else "Closed",
+        "pdfPublicLink": gcs_public_url,
+        "textPublicLink": txt_public_url,
+        "pdfSource": domain
+    }
+    
+    try:
+        doc_ref.set(update_data, merge=True)  # merge=True preserves existing fields
+        print(f"✅ Firestore updated for DOI {DOI}")
+    except Exception as e:
+        print(f"❌ Firestore update failed for DOI {DOI}: {e}")
+    
     return {
         'DOI': DOI,
         'Publication Title': title,
@@ -753,7 +793,7 @@ async def download_pdf_row(row, headers, output_dir, bucket_name):
         'SS_Publisher': ss_pub,
         'PDF Filepath': filepath if success else None,
         'PDF Source': domain,
-        'OA Status' : 'Open' if filepath else 'Closed',
+        'OA Status' : 'Open' if success else 'Closed',
         'PDF Link in GCS' : gcs_public_url,
         'Text Link in GCS' : txt_public_url,
         'Download_Success': success
