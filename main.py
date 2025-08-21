@@ -668,6 +668,7 @@ async def download_pdf_row(row, headers, output_dir, bucket_name):
     ss_url = row['SS URL']
     oa_pub = row['OpenAlex Publisher']
     ss_pub = row['SS Publisher']
+    doc_id = row['doc_id']
     gcs_filename = None
     gcs_public_url = None
     pdf_upload_error = None
@@ -770,24 +771,22 @@ async def download_pdf_row(row, headers, output_dir, bucket_name):
 
     db = firestore.Client()
 
-    def doi_to_doc_id(doi: str) -> str:
-        if doi.startswith("https://doi.org/"):
-            return doi[len("https://doi.org/"):]
-        return doi
+    if not doc_id:
+        print(f"❌ No doc_id for DOI {DOI}, skipping Firestore update")
+    else:
+        doc_ref = db.collection("papers").document(doc_id)
+        update_data = {
+            "openAccessStatus": "Open" if success else "Closed",
+            "pdfPublicLink": gcs_public_url,
+            "textPublicLink": txt_public_url,
+            "pdfSource": domain
+        }
 
-    doc_ref = db.collection("papers").document(doi_to_doc_id(DOI))
-    update_data = {
-        "openAccessStatus": "Open" if success else "Closed",
-        "pdfPublicLink": gcs_public_url,
-        "textPublicLink": txt_public_url,
-        "pdfSource": domain
-    }
-    
-    try:
-        doc_ref.set(update_data, merge=True)  # merge=True preserves existing fields
-        print(f"✅ Firestore updated for DOI {DOI}")
-    except Exception as e:
-        print(f"❌ Firestore update failed for DOI {DOI}: {e}")
+        try:
+            doc_ref.set(update_data, merge=True)# merge=True preserves existing fields
+            print(f"✅ Firestore updated for DOI {DOI}")
+        except Exception as e:
+            print(f"❌ Firestore update failed for DOI {DOI}: {e}")
     
     return {
         'DOI': DOI,
