@@ -771,10 +771,9 @@ async def download_pdf_row(row, headers, output_dir, bucket_name):
     db = firestore.Client()
 
     def doi_to_doc_id(doi: str) -> str:
-    # Remove the prefix if it exists
-    if doi.startswith("https://doi.org/"):
-        return doi[len("https://doi.org/"):]
-    return doi
+        if doi.startswith("https://doi.org/"):
+            return doi[len("https://doi.org/"):]
+        return doi
 
     doc_ref = db.collection("papers").document(doi_to_doc_id(DOI))
     update_data = {
