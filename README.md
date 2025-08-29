@@ -19,6 +19,7 @@ The function will download the pdf at the urls inputted, trying the OpenAlex url
 It will then keep a record of what publisher the pdf came from, use pdfplumber to create a text file for the document, upload the pdf and the text file to the Google Cloud Storage bucket "open-access-publications", and append the appropriate metadata to firestore.
 I have been using the following code in visual studio to use this function, where results.df is my dataframe of outputs from the API calls and I chose a batch of 500 so I was frequently saving in case of timeouts:
 
+```
 batch_size = 500
 num_batches = math.ceil(len(results_df) / batch_size)
 
@@ -58,3 +59,5 @@ for i, batch in enumerate(batches):
     if batch_result is not None:
         with open(f"{output_dir}/batch_{i+1}.json", "w") as f:
             f.write(batch_result)
+
+```
