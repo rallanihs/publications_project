@@ -6,6 +6,7 @@ import tempfile
 from urllib.parse import urlparse, urljoin
 import pdfplumber
 import asyncio, random
+import uuid
 
 from google.cloud import storage
 from google.cloud import firestore
@@ -837,7 +838,7 @@ def download_pdfs_http(request):
 
         df = pd.DataFrame(data)
         bucket_name = "open-access-publications" 
-        output_dir = "/tmp"
+        output_dir = f"/tmp/pdf_{uuid.uuid4()}"
         os.makedirs(output_dir, exist_ok=True)
 
         # Run async batch downloader
