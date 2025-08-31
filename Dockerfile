@@ -1,13 +1,22 @@
 # Use Python base image
 FROM python:3.9-slim
 
-# Install system dependencies for Playwright
+# Install system dependencies for Playwright and Selenium/Chrome
 RUN apt-get update && \
     apt-get install -y curl wget gnupg libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 \
                        libxcomposite1 libxrandr2 libxdamage1 libxfixes3 libx11-xcb1 \
                        libxkbcommon0 libxcb1 libdbus-1-3 libdrm2 libgbm1 libasound2 \
                        libpangocairo-1.0-0 libpango-1.0-0 libgtk-3-0 libxshmfence1 libepoxy0 \
+                       fonts-liberation libappindicator3-1 xdg-utils \
+                       unzip xvfb \
                        && rm -rf /var/lib/apt/lists/*
+
+# Install Chrome (stable) for Selenium
+RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - && \
+    echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list && \
+    apt-get update && \
+    apt-get install -y google-chrome-stable && \
+    rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 WORKDIR /app
