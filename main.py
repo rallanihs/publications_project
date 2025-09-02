@@ -243,7 +243,7 @@ async def elsevier_selenium_download_async(doi_url: str, filepath: str):
         chrome_options.add_experimental_option("prefs", {
             "profile.managed_default_content_settings.images": 2  # disable images
         })
-        options.binary_location = "/usr/bin/google-chrome-stable"
+        chrome_options.binary_location = "/usr/bin/google-chrome-stable"
 
         driver = uc.Chrome(options=chrome_options)
         wait = WebDriverWait(driver, 15)
@@ -623,7 +623,7 @@ async def universal_download(url: str, filepath: str):
                 "plugins.always_open_pdf_externally": True,
             }
             chrome_options.add_experimental_option("prefs", prefs)
-            options.binary_location = "/usr/bin/google-chrome-stable"
+            chrome_options.binary_location = "/usr/bin/google-chrome-stable"
 
             driver = webdriver.Chrome(options=chrome_options)
             driver.get(url)
