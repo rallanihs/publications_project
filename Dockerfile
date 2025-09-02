@@ -39,5 +39,5 @@ COPY . .
 EXPOSE 8080
 
 # Run the Functions Framework targeting your @http function
-CMD ["functions-framework", "--target", "download_pdfs_http", "--port", "8080"]
+CMD ["bash", "-c", "Xvfb :99 -screen 0 1280x1024x24 & export DISPLAY=:99 && functions-framework --target=download_pdfs_http --port=8080"]
 
