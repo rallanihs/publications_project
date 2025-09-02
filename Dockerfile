@@ -32,8 +32,12 @@ RUN pip install functions-framework
 # Install Playwright and browsers
 RUN pip install playwright && playwright install
 
+ARG CACHEBUST=${GITHUB_SHA}
+
 # Copy the rest of the code
 COPY . .
+
+RUN find /app -name "*.pyc" -delete
 
 # Expose Cloud Run port
 EXPOSE 8080
