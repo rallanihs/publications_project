@@ -139,8 +139,6 @@ async def download_wiley_selenium_async(pdfdirect_url: str, filepath: str):
         save_folder = os.path.dirname(filepath)
         os.makedirs(save_folder, exist_ok=True)
 
-        temp_profile_dir = tempfile.mkdtemp(prefix="chrome_profile_")
-
         # Convert pdfdirect → epdf
         epdf_url = pdfdirect_url.replace("/pdfdirect/", "/epdf/")
         print(f"Navigating to: {epdf_url}")
@@ -154,10 +152,8 @@ async def download_wiley_selenium_async(pdfdirect_url: str, filepath: str):
             "safebrowsing.enabled": True
         }
         options.add_experimental_option("prefs", prefs)
-        options.add_argument("--headless")
         options.add_argument("--disable-blink-features=AutomationControlled")
-        options.add_argument("--start-maximized")
-        options.add_argument(f"--user-data-dir={temp_profile_dir}")
+        options.add_argument("--window-size=1920,1080")
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
         options.binary_location = "/usr/bin/google-chrome-stable"
@@ -235,14 +231,18 @@ async def elsevier_selenium_download_async(doi_url: str, filepath: str):
     """
 
     def _download():
-        temp_dir = tempfile.mkdtemp(prefix="pdf_dl_")
-        
-        chrome_options = Options()
-        chrome_options.headless = True
-        chrome_options.add_argument(f"--user-data-dir={temp_dir}")
+        chrome_options = uc.ChromeOptions()
         chrome_options.add_experimental_option("prefs", {
-            "profile.managed_default_content_settings.images": 2  # disable images
+            "profile.managed_default_content_settings.images": 2,
+            "download.default_directory": str(filepath),
+            "download.prompt_for_download": False,
+            "download.directory_upgrade": True,
+            "safebrowsing.enabled": True
         })
+        chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+        chrome_options.add_argument("--window-size=1920,1080")
+        chrome_options.add_argument("--no-sandbox")
+        chrome_options.add_argument("--disable-dev-shm-usage")
         chrome_options.binary_location = "/usr/bin/google-chrome-stable"
 
         driver = uc.Chrome(options=chrome_options)
@@ -616,13 +616,16 @@ async def universal_download(url: str, filepath: str):
 
             chrome_options = Options()
             chrome_options.headless = True
-            chrome_options.add_argument(f"--user-data-dir={temp_dir}")
             prefs = {
                 "download.default_directory": temp_dir,
                 "download.prompt_for_download": False,
                 "plugins.always_open_pdf_externally": True,
             }
             chrome_options.add_experimental_option("prefs", prefs)
+            chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+            chrome_options.add_argument("--window-size=1920,1080")  
+            chrome_options.add_argument("--no-sandbox")
+            chrome_options.add_argument("--disable-dev-shm-usage")
             chrome_options.binary_location = "/usr/bin/google-chrome-stable"
 
             driver = webdriver.Chrome(options=chrome_options)
