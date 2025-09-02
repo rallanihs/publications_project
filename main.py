@@ -220,7 +220,6 @@ async def download_wiley_selenium_async(pdfdirect_url: str, filepath: str):
 
         finally:
             driver.quit()
-            shutil.rmtree(temp_profile_dir, ignore_errors=True)
 
     return await asyncio.to_thread(_download)
 
@@ -290,7 +289,6 @@ async def elsevier_selenium_download_async(doi_url: str, filepath: str):
 
         finally:
             driver.quit()
-            shutil.rmtree(temp_dir, ignore_errors=True)
 
     return await asyncio.to_thread(_download)
 
@@ -614,7 +612,7 @@ async def universal_download(url: str, filepath: str):
             temp_dir = tempfile.mkdtemp(prefix="pdf_dl_")
             print(f"➡️ Selenium using temp download dir: {temp_dir}")
 
-            chrome_options = Options()
+            chrome_options = uc.ChromeOptions()
             chrome_options.headless = True
             prefs = {
                 "download.default_directory": temp_dir,
@@ -628,7 +626,7 @@ async def universal_download(url: str, filepath: str):
             chrome_options.add_argument("--disable-dev-shm-usage")
             chrome_options.binary_location = "/usr/bin/google-chrome-stable"
 
-            driver = webdriver.Chrome(options=chrome_options)
+            driver = uc.Chrome(options=chrome_options)
             driver.get(url)
 
             timeout = 15
