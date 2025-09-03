@@ -1,30 +1,31 @@
 # Use Python base image
 FROM python:3.9-slim
 
-# Install system dependencies for Playwright and Selenium/Chrome
+# Install system dependencies
 RUN apt-get update && \
-    apt-get install -y curl wget gnupg libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 \
+    apt-get install -y curl wget gnupg unzip gnupg2 lsb-release ca-certificates \
+                       libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 \
                        libxcomposite1 libxrandr2 libxdamage1 libxfixes3 libx11-xcb1 \
                        libxkbcommon0 libxcb1 libdbus-1-3 libdrm2 libgbm1 libasound2 \
                        libpangocairo-1.0-0 libpango-1.0-0 libgtk-3-0 libxshmfence1 libepoxy0 \
                        fonts-liberation libappindicator3-1 xdg-utils \
-                       unzip xvfb \
-                       && rm -rf /var/lib/apt/lists/*
-
-# Install Chrome (stable) for Selenium
-RUN apt-get update && apt-get install -y wget gnupg2 lsb-release ca-certificates && \
-    wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor > /usr/share/keyrings/google-linux-signing-key.gpg && \
-    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-linux-signing-key.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list && \
-    apt-get update && \
-    apt-get install -y google-chrome-stable=139.0.7258.154-1 && \
+                       xvfb && \
     rm -rf /var/lib/apt/lists/*
 
-# Install matching ChromeDriver (v139)
-RUN CHROMEDRIVER_VERSION=139.0.7258.154 && \
-    wget -q https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip && \
-    unzip chromedriver_linux64.zip -d /usr/local/bin/ && \
-    rm chromedriver_linux64.zip && \
-    chmod +x /usr/local/bin/chromedriver
+# Pin Chrome + Chromedriver to same version (139 here)
+ARG CHROME_VERSION=139.0.7258.154
+
+# Install Chrome
+RUN wget -O /tmp/chrome.deb https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}/linux64/chrome-linux64.zip && \
+    mkdir -p /opt/chrome && \
+    unzip /tmp/chrome.deb -d /opt/chrome && \
+    rm /tmp/chrome.deb && \
+    ln -s /opt/chrome/chrome-linux64/chrome /usr/bin/google-chrome
+
+# Install Chromedriver
+RUN wget -O /tmp/chromedriver.zip https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}/linux64/chromedriver-linux64.zip && \
+    unzip /tmp/chromedriver.zip -d /usr/local/bin/ && \
+    rm /tmp/chromedriver.zip
 
 # Set working directory
 WORKDIR /app
