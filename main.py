@@ -158,7 +158,7 @@ async def download_wiley_selenium_async(pdfdirect_url: str, filepath: str):
         options.add_argument("--disable-dev-shm-usage")
         options.binary_location = "/usr/bin/google-chrome-stable"
         
-        driver = uc.Chrome(options=options)
+        driver = uc.Chrome(options=options,browser_executable_path="/usr/bin/google-chrome-stable")
 
         try:
             driver.get(epdf_url)
@@ -244,7 +244,7 @@ async def elsevier_selenium_download_async(doi_url: str, filepath: str):
         chrome_options.add_argument("--disable-dev-shm-usage")
         chrome_options.binary_location = "/usr/bin/google-chrome-stable"
 
-        driver = uc.Chrome(options=chrome_options)
+        driver = uc.Chrome(options=options,browser_executable_path="/usr/bin/google-chrome-stable")
         wait = WebDriverWait(driver, 15)
 
         try:
@@ -626,7 +626,7 @@ async def universal_download(url: str, filepath: str):
             chrome_options.add_argument("--disable-dev-shm-usage")
             chrome_options.binary_location = "/usr/bin/google-chrome-stable"
 
-            driver = uc.Chrome(options=chrome_options)
+            driver = uc.Chrome(options=options,browser_executable_path="/usr/bin/google-chrome-stable")
             driver.get(url)
 
             timeout = 15
