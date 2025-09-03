@@ -16,16 +16,16 @@ RUN apt-get update && \
 ARG CHROME_VERSION=139.0.7258.154
 
 # Install Chrome
-RUN wget -O /tmp/chrome.deb https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}/linux64/chrome-linux64.zip && \
-    mkdir -p /opt/chrome && \
-    unzip /tmp/chrome.deb -d /opt/chrome && \
-    rm /tmp/chrome.deb && \
-    ln -s /opt/chrome/chrome-linux64/chrome /usr/bin/google-chrome
+RUN wget -O /tmp/chrome.zip https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}/linux64/chrome-linux64.zip && \
+    unzip /tmp/chrome.zip -d /opt/ && \
+    rm /tmp/chrome.zip && \
+    ln -s /opt/chrome-linux64/chrome /usr/bin/google-chrome
 
 # Install Chromedriver
 RUN wget -O /tmp/chromedriver.zip https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}/linux64/chromedriver-linux64.zip && \
     unzip /tmp/chromedriver.zip -d /usr/local/bin/ && \
     rm /tmp/chromedriver.zip
+    ln -s /usr/local/bin/chromedriver-linux64/chromedriver /usr/bin/chromedriver
 
 # Set working directory
 WORKDIR /app
