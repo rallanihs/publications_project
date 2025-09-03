@@ -24,7 +24,7 @@ RUN wget -O /tmp/chrome.zip https://storage.googleapis.com/chrome-for-testing-pu
 # Install Chromedriver
 RUN wget -O /tmp/chromedriver.zip https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}/linux64/chromedriver-linux64.zip && \
     unzip /tmp/chromedriver.zip -d /usr/local/bin/ && \
-    rm /tmp/chromedriver.zip
+    rm /tmp/chromedriver.zip && \
     ln -s /usr/local/bin/chromedriver-linux64/chromedriver /usr/bin/chromedriver
 
 # Set working directory
