@@ -16,8 +16,15 @@ RUN apt-get update && apt-get install -y wget gnupg2 lsb-release ca-certificates
     wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor > /usr/share/keyrings/google-linux-signing-key.gpg && \
     echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-linux-signing-key.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list && \
     apt-get update && \
-    apt-get install -y google-chrome-stable && \
+    apt-get install -y google-chrome-stable=139.0.7258.154-1 && \
     rm -rf /var/lib/apt/lists/*
+
+# Install matching ChromeDriver (v139)
+RUN CHROMEDRIVER_VERSION=139.0.7258.154 && \
+    wget -q https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip && \
+    unzip chromedriver_linux64.zip -d /usr/local/bin/ && \
+    rm chromedriver_linux64.zip && \
+    chmod +x /usr/local/bin/chromedriver
 
 # Set working directory
 WORKDIR /app
