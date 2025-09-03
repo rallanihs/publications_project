@@ -19,7 +19,7 @@ ARG CHROME_VERSION=139.0.7258.154
 RUN wget -O /tmp/chrome.zip https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}/linux64/chrome-linux64.zip && \
     unzip /tmp/chrome.zip -d /opt/ && \
     rm /tmp/chrome.zip && \
-    ln -s /opt/chrome-linux64/chrome /usr/bin/google-chrome
+    ln -s /opt/chrome-linux64/chrome /usr/bin/google-chrome-stable
 
 # Install Chromedriver
 RUN wget -O /tmp/chromedriver.zip https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}/linux64/chromedriver-linux64.zip && \
