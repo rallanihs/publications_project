@@ -156,7 +156,8 @@ async def download_wiley_selenium_async(pdfdirect_url: str, filepath: str):
         options.add_argument("--window-size=1920,1080")
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
-        options.binary_location = "/usr/bin/google-chrome-stable"
+        options.add_argument("--headless=new")
+        options.binary_location = "/usr/bin/chromium"
         
         driver = uc.Chrome(options=options,browser_executable_path="/usr/bin/google-chrome-stable")
 
@@ -242,9 +243,10 @@ async def elsevier_selenium_download_async(doi_url: str, filepath: str):
         chrome_options.add_argument("--window-size=1920,1080")
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
-        chrome_options.binary_location = "/usr/bin/google-chrome-stable"
+        chrome_options.add_argument("--headless=new")
+        chrome_options.binary_location = "/usr/bin/chromium"
 
-        driver = uc.Chrome(options=options,browser_executable_path="/usr/bin/google-chrome-stable")
+        driver = uc.Chrome(options=chrome_options,browser_executable_path="/usr/bin/google-chrome-stable")
         wait = WebDriverWait(driver, 15)
 
         try:
@@ -624,9 +626,10 @@ async def universal_download(url: str, filepath: str):
             chrome_options.add_argument("--window-size=1920,1080")  
             chrome_options.add_argument("--no-sandbox")
             chrome_options.add_argument("--disable-dev-shm-usage")
-            chrome_options.binary_location = "/usr/bin/google-chrome-stable"
+            chrome_options.add_argument("--headless=new")
+            chrome_options.binary_location = "/usr/bin/chromium"
 
-            driver = uc.Chrome(options=options,browser_executable_path="/usr/bin/google-chrome-stable")
+            driver = uc.Chrome(options=chrome_options,browser_executable_path="/usr/bin/google-chrome-stable")
             driver.get(url)
 
             timeout = 15
