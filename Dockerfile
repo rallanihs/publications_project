@@ -16,10 +16,10 @@ RUN apt-get update && \
 ARG CHROME_VERSION=140.0.7269.0
 
 # Install Chromium
-RUN wget -O /tmp/chromium.zip https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}/linux64/chromium-linux64.zip && \
-    unzip /tmp/chromium.zip -d /opt/ && \
-    rm /tmp/chromium.zip && \
-    ln -s /opt/chromium-linux64/chrome /usr/bin/chromium
+RUN wget -O /tmp/chrome.zip https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}/linux64/chrome-linux64.zip && \
+    unzip /tmp/chrome.zip -d /opt/ && \
+    rm /tmp/chrome.zip && \
+    ln -s /opt/chrome-linux64/chrome /usr/bin/chromium
 
 # Install Chromedriver
 RUN wget -O /tmp/chromedriver.zip https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}/linux64/chromedriver-linux64.zip && \
