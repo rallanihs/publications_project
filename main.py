@@ -821,7 +821,7 @@ async def download_pdf_row(row, headers, output_dir, bucket_name):
     }
 
 # ===================== Batch Downloader =====================
-async def download_pdf_batch(df: pd.DataFrame, headers: dict, output_dir: str, bucket_name, max_concurrent=1):
+async def download_pdf_batch(df: pd.DataFrame, headers: dict, output_dir: str, bucket_name, max_concurrent=2):
     sem = asyncio.Semaphore(max_concurrent)
 
     async def sem_task(row):
