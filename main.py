@@ -159,7 +159,7 @@ async def download_wiley_selenium_async(pdfdirect_url: str, filepath: str):
         options.add_argument("--headless=new")
         options.binary_location = "/usr/bin/chromium"
         
-        driver = uc.Chrome(options=options,browser_executable_path="/usr/bin/google-chrome-stable")
+        driver = uc.Chrome(options=options,browser_executable_path="/usr/bin/chromium")
 
         try:
             driver.get(epdf_url)
@@ -246,7 +246,7 @@ async def elsevier_selenium_download_async(doi_url: str, filepath: str):
         chrome_options.add_argument("--headless=new")
         chrome_options.binary_location = "/usr/bin/chromium"
 
-        driver = uc.Chrome(options=chrome_options,browser_executable_path="/usr/bin/google-chrome-stable")
+        driver = uc.Chrome(options= chrome_options, browser_executable_path="/usr/bin/chromium")
         wait = WebDriverWait(driver, 15)
 
         try:
@@ -615,7 +615,6 @@ async def universal_download(url: str, filepath: str):
             print(f"➡️ Selenium using temp download dir: {temp_dir}")
 
             chrome_options = uc.ChromeOptions()
-            chrome_options.headless = True
             prefs = {
                 "download.default_directory": temp_dir,
                 "download.prompt_for_download": False,
@@ -629,7 +628,7 @@ async def universal_download(url: str, filepath: str):
             chrome_options.add_argument("--headless=new")
             chrome_options.binary_location = "/usr/bin/chromium"
 
-            driver = uc.Chrome(options=chrome_options,browser_executable_path="/usr/bin/google-chrome-stable")
+            driver = uc.Chrome(options= chrome_options, browser_executable_path="/usr/bin/chromium")
             driver.get(url)
 
             timeout = 15
