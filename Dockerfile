@@ -38,7 +38,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install functions-framework
 
 # Install Playwright and browsers
-RUN pip install playwright
+RUN pip install playwright && playwright install
 
 ARG CACHEBUST=${GITHUB_SHA}
 
